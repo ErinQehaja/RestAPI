@@ -18,6 +18,13 @@ namespace MyFirstWebApplication.Controllers
             _logger = logger;
         }
 
+        [HttpPut("increase/{value}", Name = "IncreaseInt")]
+        public ActionResult<int> IncreaseInt(int value)
+        {
+            int increasedValue = value + 1;
+            return Ok(increasedValue);
+        }
+
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
