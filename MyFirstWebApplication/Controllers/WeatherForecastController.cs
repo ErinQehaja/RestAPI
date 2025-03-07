@@ -25,6 +25,18 @@ namespace MyFirstWebApplication.Controllers
             return Ok(increasedValue);
         }
 
+        [HttpPost("add", Name = "AddTwoNumbers")]
+        public ActionResult<int> AddTwoNumbers([FromBody] AddNumbersRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            int sum = request.Number1 + request.Number2;
+            return Ok(sum);
+        }
+
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
@@ -36,5 +48,10 @@ namespace MyFirstWebApplication.Controllers
             })
             .ToArray();
         }
+    }
+    public class AddNumbersRequest
+    {
+        public int Number1 { get; set; }
+        public int Number2 { get; set; }
     }
 }
