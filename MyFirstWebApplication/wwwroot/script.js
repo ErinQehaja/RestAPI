@@ -1,17 +1,17 @@
-async function addNumbersWithAPI() {
-    const input1 = parseInt(document.getElementById("input1").value);
-    const input2 = parseInt(document.getElementById("input2").value);
-    
-    if (isNaN(input1) || isNaN(input2)) {
+﻿async function addNumbersWithAPI() {
+    const number1 = parseInt(document.getElementById("number1").value);
+    const number2 = parseInt(document.getElementById("number2").value);
+
+    if (isNaN(number1) || isNaN(number2)) {
         document.getElementById("result").innerText = "Bitte gültige Zahlen eingeben!";
         return;
     }
-    
+
     const data = {
-        Input1: input1,
-        Input2: input2
+        Number1: number1,
+        Number2: number2
     };
-    
+
     try {
         const response = await fetch("https://localhost:7112/WeatherForecast/add", {
             method: "PUT",
@@ -20,11 +20,11 @@ async function addNumbersWithAPI() {
             },
             body: JSON.stringify(data)
         });
-        
+
         if (!response.ok) {
             throw new Error("Fehler bei der API-Anfrage");
         }
-        
+
         const result = await response.json();
         document.getElementById("result").innerText = result;
     } catch (error) {
