@@ -25,7 +25,7 @@ namespace MyFirstWebApplication.Controllers
             return Ok(increasedValue);
         }
 
-        [HttpPost("add", Name = "AddTwoNumbers")]
+        [HttpPut("add", Name = "AddTwoNumbers")]
         public ActionResult<int> AddTwoNumbers([FromBody] AddNumbersRequest request)
         {
             if (request == null)
