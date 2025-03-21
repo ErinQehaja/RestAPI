@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schulverwaltung</title>
+    <script defer src="script_school.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        form, ul {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 5px 0;
+        }
+
+        input, select, button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Schulverwaltung</h1>
+
+    <h2>Neuen Schüler hinzufügen</h2>
+    <form id="addStudentForm">
+        <label>Geburtstag: <input type="date" id="geburtstag" required></label>
+        <label>
+            Geschlecht:
+            <select id="geschlecht" required>
+                <option value="männlich">Männlich</option>
+                <option value="weiblich">Weiblich</option>
+            </select>
+        </label>
+        <label>Klasse: <input type="text" id="klasse" placeholder="z.B. 10A" required></label>
+        <button type="submit">Schüler hinzufügen</button>
+    </form>
+
+    <h2>Alle Schüler der Schule abrufen</h2>
+    <button id="getAllStudents">Lade alle Schüler</button>
+    <ul id="studentsList"></ul>
+
+    <h2>Schüler einer bestimmten Klasse abrufen</h2>
+    <input type="text" id="classFilter" placeholder="z.B. 10A">
+    <button id="getStudentsByClass">Laden</button>
+    <ul id="classStudentsList"></ul>
+
+    <h2>Kann eine Klasse in einem Klassenraum unterrichtet werden?</h2>
+    <label>Klasse: <input type="text" id="checkClass" placeholder="z.B. 10A"></label>
+    <label>Raumgröße in m²: <input type="text" id="roomSize" placeholder="z.B. 50"></label>
+    <button id="checkRoom">Prüfen</button>
+    <p id="roomCheckResult"></p>
+</body>
+</html>
