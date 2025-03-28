@@ -3,23 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styleSchool.css">
     <title>School Management</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        .section {
-            margin-bottom: 20px;
-        }
-
-        .result {
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-    </style>
 </head>
 <body>
     <h1>School Management System</h1>
@@ -27,9 +12,9 @@
     <div class="section">
         <h2>Add New Student</h2>
         <form id="addStudentForm">
-            <input type="text" id="gender" placeholder="Gender" required><br><br>
-            <input type="date" id="dateOfBirth" required><br><br>
-            <input type="text" id="className" placeholder="Class Name" required><br><br>
+            <input type="text" id="gender" placeholder="Gender" required>
+            <input type="date" id="dateOfBirth" required>
+            <input type="text" id="className" placeholder="Class Name" required>
             <button type="submit">Add Student</button>
         </form>
         <div id="addResult" class="result"></div>
