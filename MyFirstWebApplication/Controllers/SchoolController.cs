@@ -160,7 +160,6 @@ namespace MyFirstWebApplication.Controllers
                     return BadRequest(new { message = "Student name cannot be empty." });
                 }
 
-                // Use ToLower() for case-insensitive comparison, which EF Core can translate
                 var student = _context.Students
                     .FirstOrDefault(s => s.SchoolId == 1 && s.Name.ToLower() == name.ToLower());
                 if (student == null)
@@ -218,7 +217,6 @@ namespace MyFirstWebApplication.Controllers
                     return BadRequest(new { message = "Class name cannot be empty." });
                 }
 
-                // Use ToLower() for case-insensitive comparison, which EF Core can translate
                 var students = _context.Students
                     .Where(s => s.SchoolId == 1 && s.ClassName.ToLower() == className.ToLower())
                     .ToList();
