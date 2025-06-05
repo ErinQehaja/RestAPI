@@ -1,4 +1,4 @@
-﻿const apiBaseUrl = 'http://localhost:5132/api/school'; 
+﻿const apiBaseUrl = 'http://localhost:5132/api/school';
 
 function toggleMenu() {
     const menu = document.getElementById('menu');
@@ -19,7 +19,7 @@ async function addStudent(event) {
     const className = document.getElementById('student-class').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/students`, {
+        const response = await fetch(`${apiBaseUrl}/students`, { // Changed API_BASE_URL to apiBaseUrl
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, gender, dateOfBirth: dob, className })
@@ -41,7 +41,7 @@ async function deleteStudent(event) {
     const id = document.getElementById('student-id').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/students/${id}`, {
+        const response = await fetch(`${apiBaseUrl}/students/${id}`, {
             method: 'DELETE'
         });
         const result = await response.json();
@@ -58,7 +58,7 @@ async function deleteStudent(event) {
 
 async function getAllStudents() {
     try {
-        const response = await fetch(`${API_BASE_URL}/students`);
+        const response = await fetch(`${apiBaseUrl}/students`);
         const students = await response.json();
         const list = document.getElementById('students-list');
         list.innerHTML = students.length ?
@@ -74,7 +74,7 @@ async function getStudentByName(event) {
     const name = document.getElementById('search-student-name').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/students/name/${encodeURIComponent(name)}`);
+        const response = await fetch(`${apiBaseUrl}/students/name/${encodeURIComponent(name)}`);
         const result = await response.json();
         const display = document.getElementById('student-search-result');
         if (response.ok) {
@@ -92,7 +92,7 @@ async function getStudentsByClass(event) {
     const className = document.getElementById('search-class-name').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/students/class/${encodeURIComponent(className)}`);
+        const response = await fetch(`${apiBaseUrl}/students/class/${encodeURIComponent(className)}`);
         const students = await response.json();
         const display = document.getElementById('students-class-result');
         display.innerHTML = students.length ?
@@ -111,7 +111,7 @@ async function addClassroom(event) {
     const hasCynapSystem = document.getElementById('classroom-cynap').checked;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/classrooms`, {
+        const response = await fetch(`${apiBaseUrl}/classrooms`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ roomName, size, capacity, hasCynapSystem })
@@ -133,7 +133,7 @@ async function deleteClassroom(event) {
     const id = document.getElementById('classroom-id').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/classrooms/${id}`, {
+        const response = await fetch(`${apiBaseUrl}/classrooms/${id}`, {
             method: 'DELETE'
         });
         const result = await response.json();
@@ -150,7 +150,7 @@ async function deleteClassroom(event) {
 
 async function getAllClassrooms() {
     try {
-        const response = await fetch(`${API_BASE_URL}/classrooms`);
+        const response = await fetch(`${apiBaseUrl}/classrooms`);
         const classrooms = await response.json();
         const list = document.getElementById('classrooms-list');
         list.innerHTML = classrooms.length ?
@@ -166,7 +166,7 @@ async function getClassroomByName(event) {
     const roomName = document.getElementById('search-classroom-name').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/classrooms/${encodeURIComponent(roomName)}`);
+        const response = await fetch(`${apiBaseUrl}/classrooms/${encodeURIComponent(roomName)}`);
         const result = await response.json();
         const display = document.getElementById('classroom-search-result');
         if (response.ok) {
@@ -185,7 +185,7 @@ async function checkClassFit(event) {
     const roomName = document.getElementById('fit-room-name').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/classroom/fit?className=${encodeURIComponent(className)}&roomName=${encodeURIComponent(roomName)}`);
+        const response = await fetch(`${apiBaseUrl}/classroom/fit?className=${encodeURIComponent(className)}&roomName=${encodeURIComponent(roomName)}`);
         const result = await response.json();
         const display = document.getElementById('fit-result');
         if (response.ok) {

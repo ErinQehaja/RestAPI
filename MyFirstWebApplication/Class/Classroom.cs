@@ -1,37 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyFirstWebApplication.Class
 {
     public class Classroom
     {
-        public string RoomName { get; set; }
-        public double Size { get; set; } // Größe in Quadratmeter
-        public int Capacity { get; set; } // Nummer der Sitze
-        public bool HasCynap { get; set; }
-        public List<Student> Students { get; private set; }
+        private readonly int _id;
+        private string _roomName;
+        private double _size;
+        private int _capacity;
 
-        public Classroom(string roomName, double size, int capacity, bool hasCynap)
+        public Classroom(int id, string roomName, double size, int capacity, bool hasCynapSystem)
         {
-            RoomName = roomName;
-            Size = size;
-            Capacity = capacity;
-            HasCynap = hasCynap;
-            Students = new List<Student>();
+            if (id <= 0) throw new ArgumentException("ID must be positive.", nameof(id));
+            if (string.IsNullOrWhiteSpace(roomName)) throw new ArgumentException("Room name cannot be empty.", nameof(roomName));
+            if (size <= 0) throw new ArgumentException("Size must be positive.", nameof(size));
+            if (capacity <= 0) throw new ArgumentException("Capacity must be positive.", nameof(capacity));
+
+            _id = id;
+            _roomName = roomName;
+            _size = size;
+            _capacity = capacity;
+            HasCynapSystem = hasCynapSystem;
         }
 
-        public bool AddStudent(Student student)
+        public int Id => _id;
+        public string RoomName
         {
-            if (Students.Count >= Capacity)
-            {
-                return false; 
-            }
-
-            Students.Add(student);
-            return true;
+            get => _roomName;
+            set => _roomName = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Room name cannot be empty.", nameof(value)) : value;
         }
+        public double Size
+        {
+            get => _size;
+            set => _size = value <= 0 ? throw new ArgumentException("Size must be positive.", nameof(value)) : value;
+        }
+        public int Capacity
+        {
+            get => _capacity;
+            set => _capacity = value <= 0 ? throw new ArgumentException("Capacity must be positive.", nameof(value)) : value;
+        }
+        public bool HasCynapSystem { get; set; }
     }
 }

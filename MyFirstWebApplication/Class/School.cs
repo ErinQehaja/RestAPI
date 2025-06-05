@@ -1,92 +1,128 @@
-﻿using System;
+﻿using MyFirstWebApplication.Class;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyFirstWebApplication.Class
 {
     public class School
     {
-        public string Name { get; set; }
-        public List<Student> Students { get; private set; }
-        public List<Classroom> Classrooms { get; private set; }
+        private readonly int _id;
+        private string _name;
+        private readonly List<Student> _students;
+        private readonly List<Classroom> _classrooms;
 
-        public School(string name)
+        public School(int id, string name)
         {
-            Name = name;
-            Students = new List<Student>();
-            Classrooms = new List<Classroom>();
+            if (id <= 0) throw new ArgumentException("ID must be positive.", nameof(id));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
+
+            _id = id;
+            _name = name;
+            _students = new List<Student>();
+            _classrooms = new List<Classroom>();
         }
+
+        public int Id => _id;
+        public string Name
+        {
+            get => _name;
+            set => _name = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Name cannot be empty.", nameof(value)) : value;
+        }
+        public IReadOnlyList<Student> Students => _students.AsReadOnly();
+        public IReadOnlyList<Classroom> Classrooms => _classrooms.AsReadOnly();
 
         public void AddStudent(Student student)
         {
-            Students.Add(student);
+            if (student == null) throw new ArgumentNullException(nameof(student));
+            if (_students.Any(s => s.Id == student.Id)) throw new ArgumentException("Student already exists.", nameof(student));
+
+            _students.Add(student);
         }
 
         public void AddClassroom(Classroom classroom)
         {
-            Classrooms.Add(classroom);
+            if (classroom == null) throw new ArgumentNullException(nameof(classroom));
+            if (_classrooms.Any(c => c.Id == classroom.Id)) throw new ArgumentException("Classroom already exists.", nameof(classroom));
+
+            _classrooms.Add(classroom);
+        }
+
+        public bool RemoveStudent(int studentId)
+        {
+            var student = _students.FirstOrDefault(s => s.Id == studentId);
+            if (student == null) return false;
+
+            return _students.Remove(student);
+        }
+
+        public bool RemoveClassroom(int classroomId)
+        {
+            var classroom = _classrooms.FirstOrDefault(c => c.Id == classroomId);
+            if (classroom == null) return false;
+
+            return _classrooms.Remove(classroom);
         }
 
         public int GetTotalStudents()
         {
-            return Students.Count;
+            return _students.Count;
         }
 
-        public int GetStudentsByGender(string gender)
+        public int GetStudentsByGender(Gender gender)
         {
-            return Students.Count(s => s.GenderPerson.Equals(gender, StringComparison.OrdinalIgnoreCase));
+            return _students.Count(s => s.Gender == gender);
         }
 
         public int GetTotalClassrooms()
         {
-            return Classrooms.Count;
+            return _classrooms.Count;
         }
 
         public double GetAverageAge()
         {
-            if (!Students.Any()) return 0;
+            if (!_students.Any()) return 0;
 
             var today = DateTime.Today;
-            return Students.Average(s => (today - s.DateOfBirth).TotalDays / 365);
+            return _students.Average(s => (today - s.DateOfBirth).TotalDays / 365);
         }
 
-        public List<Classroom> GetClassroomsWithCynap()
+        public IReadOnlyList<Classroom> GetClassroomsWithCynapSystem()
         {
-            return Classrooms.Where(c => c.HasCynap).ToList();
+            return _classrooms.Where(c => c.HasCynapSystem).ToList().AsReadOnly();
         }
 
-        public int GetTotalClasses()
+        public int GetTotalDistinctClasses()
         {
-            return Students.Select(s => s.Class).Distinct().Count();
+            return _students.Select(s => s.ClassName).Distinct().Count();
         }
 
-        public Dictionary<string, int> GetClassesWithStudentCount()
+        public IReadOnlyDictionary<string, int> GetClassesWithStudentCount()
         {
-            return Students.GroupBy(s => s.Class)
-                           .ToDictionary(g => g.Key, g => g.Count());
+            return _students.GroupBy(s => s.ClassName)
+                           .ToDictionary(g => g.Key, g => g.Count())
+                           .AsReadOnly();
         }
 
         public double GetFemalePercentageInClass(string className)
         {
-            var studentsInClass = Students.Where(s => s.Class == className).ToList();
+            if (string.IsNullOrWhiteSpace(className)) throw new ArgumentException("Class name cannot be empty.", nameof(className));
+
+            var studentsInClass = _students.Where(s => s.ClassName == className).ToList();
             if (!studentsInClass.Any()) return 0;
 
-            var femaleCount = studentsInClass.Count(s => s.GenderPerson.Equals("Female", StringComparison.OrdinalIgnoreCase));
+            var femaleCount = studentsInClass.Count(s => s.Gender == Gender.Female);
             return (double)femaleCount / studentsInClass.Count * 100;
         }
 
         public bool CanClassFitInRoom(string className, string roomName)
         {
-            var studentsInClass = Students.Count(s => s.Class == className);
-            var room = Classrooms.FirstOrDefault(r => r.RoomName == roomName);
-            return room != null && room.Capacity >= studentsInClass;
-        }
+            if (string.IsNullOrWhiteSpace(className)) throw new ArgumentException("Class name cannot be empty.", nameof(className));
+            if (string.IsNullOrWhiteSpace(roomName)) throw new ArgumentException("Room name cannot be empty.", nameof(roomName));
 
-        public List<Student> GetAllStudents()
-        {
-            return Students;
+            var studentsInClass = _students.Count(s => s.ClassName == className);
+            var room = _classrooms.FirstOrDefault(r => r.RoomName == roomName);
+            return room != null && room.Capacity >= studentsInClass;
         }
     }
 }
