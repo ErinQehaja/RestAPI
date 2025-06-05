@@ -11,23 +11,21 @@ namespace MyFirstWebApplication.Class
 
     public abstract class Person
     {
-        private readonly int _id;
-        private readonly Gender _gender;
-        private readonly DateTime _dateOfBirth;
+        public int Id { get; set; } // Changed to public set for EF
+        public Gender Gender { get; set; } // Changed to public set for EF
+        public DateTime DateOfBirth { get; set; } // Changed to public set for EF
 
-        protected Person(int id, Gender gender, DateTime dateOfBirth)
+        protected Person() { } // Parameterless constructor for EF
+
+        public Person(int id, Gender gender, DateTime dateOfBirth)
         {
             if (id <= 0) throw new ArgumentException("ID must be positive.", nameof(id));
             if (!Enum.IsDefined(typeof(Gender), gender)) throw new ArgumentException("Invalid gender.", nameof(gender));
             if (dateOfBirth > DateTime.Today) throw new ArgumentException("Date of birth cannot be in the future.", nameof(dateOfBirth));
 
-            _id = id;
-            _gender = gender;
-            _dateOfBirth = dateOfBirth;
+            Id = id;
+            Gender = gender;
+            DateOfBirth = dateOfBirth;
         }
-
-        public int Id => _id;
-        public Gender Gender => _gender;
-        public DateTime DateOfBirth => _dateOfBirth;
     }
 }

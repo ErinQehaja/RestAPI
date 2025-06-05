@@ -19,11 +19,18 @@ async function addStudent(event) {
     const className = document.getElementById('student-class').value;
 
     try {
-        const response = await fetch(`${apiBaseUrl}/students`, { // Changed API_BASE_URL to apiBaseUrl
+        const response = await fetch(`${apiBaseUrl}/students`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, gender, dateOfBirth: dob, className })
         });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Expected JSON response, but received: ${text}`);
+        }
+
         const result = await response.json();
         if (response.ok) {
             alert(result.message);
@@ -44,6 +51,13 @@ async function deleteStudent(event) {
         const response = await fetch(`${apiBaseUrl}/students/${id}`, {
             method: 'DELETE'
         });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Expected JSON response, but received: ${text}`);
+        }
+
         const result = await response.json();
         if (response.ok) {
             alert(result.message);
@@ -59,6 +73,11 @@ async function deleteStudent(event) {
 async function getAllStudents() {
     try {
         const response = await fetch(`${apiBaseUrl}/students`);
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.message);
+        }
+
         const students = await response.json();
         const list = document.getElementById('students-list');
         list.innerHTML = students.length ?
@@ -75,6 +94,12 @@ async function getStudentByName(event) {
 
     try {
         const response = await fetch(`${apiBaseUrl}/students/name/${encodeURIComponent(name)}`);
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Expected JSON response, but received: ${text}`);
+        }
+
         const result = await response.json();
         const display = document.getElementById('student-search-result');
         if (response.ok) {
@@ -93,6 +118,11 @@ async function getStudentsByClass(event) {
 
     try {
         const response = await fetch(`${apiBaseUrl}/students/class/${encodeURIComponent(className)}`);
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.message);
+        }
+
         const students = await response.json();
         const display = document.getElementById('students-class-result');
         display.innerHTML = students.length ?
@@ -116,6 +146,13 @@ async function addClassroom(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ roomName, size, capacity, hasCynapSystem })
         });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Expected JSON response, but received: ${text}`);
+        }
+
         const result = await response.json();
         if (response.ok) {
             alert(result.message);
@@ -136,6 +173,13 @@ async function deleteClassroom(event) {
         const response = await fetch(`${apiBaseUrl}/classrooms/${id}`, {
             method: 'DELETE'
         });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Expected JSON response, but received: ${text}`);
+        }
+
         const result = await response.json();
         if (response.ok) {
             alert(result.message);
@@ -151,6 +195,11 @@ async function deleteClassroom(event) {
 async function getAllClassrooms() {
     try {
         const response = await fetch(`${apiBaseUrl}/classrooms`);
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.message);
+        }
+
         const classrooms = await response.json();
         const list = document.getElementById('classrooms-list');
         list.innerHTML = classrooms.length ?
@@ -167,6 +216,12 @@ async function getClassroomByName(event) {
 
     try {
         const response = await fetch(`${apiBaseUrl}/classrooms/${encodeURIComponent(roomName)}`);
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Expected JSON response, but received: ${text}`);
+        }
+
         const result = await response.json();
         const display = document.getElementById('classroom-search-result');
         if (response.ok) {
@@ -186,6 +241,12 @@ async function checkClassFit(event) {
 
     try {
         const response = await fetch(`${apiBaseUrl}/classroom/fit?className=${encodeURIComponent(className)}&roomName=${encodeURIComponent(roomName)}`);
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Expected JSON response, but received: ${text}`);
+        }
+
         const result = await response.json();
         const display = document.getElementById('fit-result');
         if (response.ok) {

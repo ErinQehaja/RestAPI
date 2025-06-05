@@ -1,14 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyFirstWebApplication.Class
 {
     public class Classroom
     {
-        private readonly int _id;
-        private string _roomName;
-        private double _size;
-        private int _capacity;
+        public int Id { get; set; } // Changed to public set for EF
+        public string RoomName { get; set; } = null!; // EF requires non-nullable for required fields
+        public double Size { get; set; }
+        public int Capacity { get; set; }
+        public bool HasCynapSystem { get; set; }
+
+        public int SchoolId { get; set; } // Foreign key to School
+        public School School { get; set; } // Navigation property for EF
+
+        public Classroom() { } // Parameterless constructor for EF
 
         public Classroom(int id, string roomName, double size, int capacity, bool hasCynapSystem)
         {
@@ -17,29 +23,11 @@ namespace MyFirstWebApplication.Class
             if (size <= 0) throw new ArgumentException("Size must be positive.", nameof(size));
             if (capacity <= 0) throw new ArgumentException("Capacity must be positive.", nameof(capacity));
 
-            _id = id;
-            _roomName = roomName;
-            _size = size;
-            _capacity = capacity;
+            Id = id;
+            RoomName = roomName;
+            Size = size;
+            Capacity = capacity;
             HasCynapSystem = hasCynapSystem;
         }
-
-        public int Id => _id;
-        public string RoomName
-        {
-            get => _roomName;
-            set => _roomName = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Room name cannot be empty.", nameof(value)) : value;
-        }
-        public double Size
-        {
-            get => _size;
-            set => _size = value <= 0 ? throw new ArgumentException("Size must be positive.", nameof(value)) : value;
-        }
-        public int Capacity
-        {
-            get => _capacity;
-            set => _capacity = value <= 0 ? throw new ArgumentException("Capacity must be positive.", nameof(value)) : value;
-        }
-        public bool HasCynapSystem { get; set; }
     }
 }

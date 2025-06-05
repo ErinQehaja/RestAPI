@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyFirstWebApplication.Class;
+using MyFirstWebApplication.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace MyFirstWebApplication.Controllers
 {
@@ -10,25 +12,51 @@ namespace MyFirstWebApplication.Controllers
     [ApiController]
     public class SchoolController : ControllerBase
     {
-        private static readonly School _school = new School(1, "MySchool");
+        private readonly SchoolDbContext _context;
+
+        public SchoolController(SchoolDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpPost("students")]
         public IActionResult AddStudent([FromBody] StudentDto studentDto)
         {
             try
             {
+                Console.WriteLine($"Received StudentDto: Name={studentDto.Name}, Gender={studentDto.Gender}, DateOfBirth={studentDto.DateOfBirth}, ClassName={studentDto.ClassName}");
+
                 if (!Enum.TryParse<Gender>(studentDto.Gender, true, out var gender))
                 {
                     return BadRequest(new { message = "Invalid gender value." });
                 }
 
-                var student = new Student(GenerateUniqueStudentId(), gender, studentDto.DateOfBirth, studentDto.Name, studentDto.ClassName);
-                _school.AddStudent(student);
+                if (studentDto.DateOfBirth > DateTime.Today)
+                {
+                    return BadRequest(new { message = "Date of birth cannot be in the future." });
+                }
+
+                var school = _context.Schools.FirstOrDefault(s => s.Id == 1);
+                if (school == null)
+                {
+                    return NotFound(new { message = "School not found." });
+                }
+
+                var student = new Student(GenerateUniqueStudentId(), gender, studentDto.DateOfBirth, studentDto.Name, studentDto.ClassName)
+                {
+                    SchoolId = school.Id
+                };
+                _context.Students.Add(student);
+                _context.SaveChanges();
                 return Ok(new { message = "Student added successfully" });
             }
-            catch (ArgumentException ex)
+            catch (DbUpdateConcurrencyException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Concurrency error: The data may have been modified or deleted. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error adding student: {ex.Message}" });
             }
         }
 
@@ -37,12 +65,19 @@ namespace MyFirstWebApplication.Controllers
         {
             try
             {
-                var success = _school.RemoveStudent(id);
-                if (!success)
+                var student = _context.Students.FirstOrDefault(s => s.Id == id && s.SchoolId == 1);
+                if (student == null)
                 {
                     return NotFound(new { message = "Student not found." });
                 }
+
+                _context.Students.Remove(student);
+                _context.SaveChanges();
                 return Ok(new { message = "Student deleted successfully" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new { message = "Concurrency error: The data may have been modified or deleted. Please try again." });
             }
             catch (Exception ex)
             {
@@ -55,13 +90,31 @@ namespace MyFirstWebApplication.Controllers
         {
             try
             {
-                var classroom = new Classroom(GenerateUniqueClassroomId(), classroomDto.RoomName, classroomDto.Size, classroomDto.Capacity, classroomDto.HasCynapSystem);
-                _school.AddClassroom(classroom);
+                var school = _context.Schools.FirstOrDefault(s => s.Id == 1);
+                if (school == null)
+                {
+                    return NotFound(new { message = "School not found." });
+                }
+
+                var classroom = new Classroom(GenerateUniqueClassroomId(), classroomDto.RoomName, classroomDto.Size, classroomDto.Capacity, classroomDto.HasCynapSystem)
+                {
+                    SchoolId = school.Id
+                };
+                _context.Classrooms.Add(classroom);
+                _context.SaveChanges();
                 return Ok(new { message = "Classroom added successfully" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new { message = "Concurrency error: The data may have been modified or deleted. Please try again." });
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error adding classroom: {ex.Message}" });
             }
         }
 
@@ -70,12 +123,19 @@ namespace MyFirstWebApplication.Controllers
         {
             try
             {
-                var success = _school.RemoveClassroom(id);
-                if (!success)
+                var classroom = _context.Classrooms.FirstOrDefault(c => c.Id == id && c.SchoolId == 1);
+                if (classroom == null)
                 {
                     return NotFound(new { message = "Classroom not found." });
                 }
+
+                _context.Classrooms.Remove(classroom);
+                _context.SaveChanges();
                 return Ok(new { message = "Classroom deleted successfully" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new { message = "Concurrency error: The data may have been modified or deleted. Please try again." });
             }
             catch (Exception ex)
             {
@@ -86,63 +146,88 @@ namespace MyFirstWebApplication.Controllers
         [HttpGet("students")]
         public IActionResult GetAllStudents()
         {
-            return Ok(_school.Students);
+            var students = _context.Students.Where(s => s.SchoolId == 1).ToList();
+            return Ok(students);
         }
 
         [HttpGet("students/name/{name}")]
         public IActionResult GetStudentByName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            try
             {
-                return BadRequest(new { message = "Student name cannot be empty." });
-            }
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    return BadRequest(new { message = "Student name cannot be empty." });
+                }
 
-            var student = _school.Students
-                .FirstOrDefault(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (student == null)
+                // Use ToLower() for case-insensitive comparison, which EF Core can translate
+                var student = _context.Students
+                    .FirstOrDefault(s => s.SchoolId == 1 && s.Name.ToLower() == name.ToLower());
+                if (student == null)
+                {
+                    return NotFound(new { message = "Student not found." });
+                }
+
+                return Ok(student);
+            }
+            catch (Exception ex)
             {
-                return NotFound(new { message = "Student not found." });
+                return BadRequest(new { message = $"Error retrieving student by name: {ex.Message}" });
             }
-
-            return Ok(student);
         }
 
         [HttpGet("classrooms")]
         public IActionResult GetAllClassrooms()
         {
-            return Ok(_school.Classrooms);
+            var classrooms = _context.Classrooms.Where(c => c.SchoolId == 1).ToList();
+            return Ok(classrooms);
         }
 
         [HttpGet("classrooms/{roomName}")]
         public IActionResult GetClassroomByName(string roomName)
         {
-            if (string.IsNullOrWhiteSpace(roomName))
+            try
             {
-                return BadRequest(new { message = "Room name cannot be empty." });
-            }
+                if (string.IsNullOrWhiteSpace(roomName))
+                {
+                    return BadRequest(new { message = "Room name cannot be empty." });
+                }
 
-            var classroom = _school.Classrooms
-                .FirstOrDefault(c => c.RoomName.Equals(roomName, StringComparison.OrdinalIgnoreCase));
-            if (classroom == null)
+                var classroom = _context.Classrooms
+                    .FirstOrDefault(c => c.SchoolId == 1 && c.RoomName.ToLower() == roomName.ToLower());
+                if (classroom == null)
+                {
+                    return NotFound(new { message = "Classroom not found." });
+                }
+
+                return Ok(classroom);
+            }
+            catch (Exception ex)
             {
-                return NotFound(new { message = "Classroom not found." });
+                return BadRequest(new { message = $"Error retrieving classroom by name: {ex.Message}" });
             }
-
-            return Ok(classroom);
         }
 
         [HttpGet("students/class/{className}")]
         public IActionResult GetStudentsByClass(string className)
         {
-            if (string.IsNullOrWhiteSpace(className))
+            try
             {
-                return BadRequest(new { message = "Class name cannot be empty." });
-            }
+                if (string.IsNullOrWhiteSpace(className))
+                {
+                    return BadRequest(new { message = "Class name cannot be empty." });
+                }
 
-            var students = _school.Students
-                .Where(s => s.ClassName.Equals(className, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            return Ok(students);
+                // Use ToLower() for case-insensitive comparison, which EF Core can translate
+                var students = _context.Students
+                    .Where(s => s.SchoolId == 1 && s.ClassName.ToLower() == className.ToLower())
+                    .ToList();
+                return Ok(students);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error retrieving students by class: {ex.Message}" });
+            }
         }
 
         [HttpGet("classroom/fit")]
@@ -150,10 +235,29 @@ namespace MyFirstWebApplication.Controllers
         {
             try
             {
-                var canFit = _school.CanClassFitInRoom(className, roomName);
+                if (string.IsNullOrWhiteSpace(className))
+                {
+                    return BadRequest(new { message = "Class name cannot be empty." });
+                }
+                if (string.IsNullOrWhiteSpace(roomName))
+                {
+                    return BadRequest(new { message = "Room name cannot be empty." });
+                }
+
+                var studentsInClass = _context.Students
+                    .Count(s => s.SchoolId == 1 && s.ClassName.ToLower() == className.ToLower());
+                var room = _context.Classrooms
+                    .FirstOrDefault(r => r.SchoolId == 1 && r.RoomName.ToLower() == roomName.ToLower());
+
+                if (room == null)
+                {
+                    return NotFound(new { message = "Room not found." });
+                }
+
+                var canFit = room.Capacity >= studentsInClass;
                 return Ok(new { className, roomName, canFit });
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
@@ -166,7 +270,7 @@ namespace MyFirstWebApplication.Controllers
             do
             {
                 id = random.Next(1, int.MaxValue);
-            } while (_school.Students.Any(s => s.Id == id));
+            } while (_context.Students.Any(s => s.Id == id));
             return id;
         }
 
@@ -177,7 +281,7 @@ namespace MyFirstWebApplication.Controllers
             do
             {
                 id = random.Next(1, int.MaxValue);
-            } while (_school.Classrooms.Any(c => c.Id == id));
+            } while (_context.Classrooms.Any(c => c.Id == id));
             return id;
         }
     }

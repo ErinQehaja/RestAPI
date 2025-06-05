@@ -1,5 +1,4 @@
-﻿using MyFirstWebApplication.Class;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,108 +6,99 @@ namespace MyFirstWebApplication.Class
 {
     public class School
     {
-        private readonly int _id;
-        private string _name;
-        private readonly List<Student> _students;
-        private readonly List<Classroom> _classrooms;
+        public int Id { get; set; } // Changed to public set for EF
+        public string Name { get; set; } = null!; // EF requires non-nullable for required fields
+        public List<Student> Students { get; set; } = new List<Student>(); // Navigation property for EF
+        public List<Classroom> Classrooms { get; set; } = new List<Classroom>(); // Navigation property for EF
+
+        public School() { } // Parameterless constructor for EF
 
         public School(int id, string name)
         {
             if (id <= 0) throw new ArgumentException("ID must be positive.", nameof(id));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
 
-            _id = id;
-            _name = name;
-            _students = new List<Student>();
-            _classrooms = new List<Classroom>();
+            Id = id;
+            Name = name;
         }
-
-        public int Id => _id;
-        public string Name
-        {
-            get => _name;
-            set => _name = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Name cannot be empty.", nameof(value)) : value;
-        }
-        public IReadOnlyList<Student> Students => _students.AsReadOnly();
-        public IReadOnlyList<Classroom> Classrooms => _classrooms.AsReadOnly();
 
         public void AddStudent(Student student)
         {
             if (student == null) throw new ArgumentNullException(nameof(student));
-            if (_students.Any(s => s.Id == student.Id)) throw new ArgumentException("Student already exists.", nameof(student));
+            if (Students.Any(s => s.Id == student.Id)) throw new ArgumentException("Student already exists.", nameof(student));
 
-            _students.Add(student);
+            Students.Add(student);
         }
 
         public void AddClassroom(Classroom classroom)
         {
             if (classroom == null) throw new ArgumentNullException(nameof(classroom));
-            if (_classrooms.Any(c => c.Id == classroom.Id)) throw new ArgumentException("Classroom already exists.", nameof(classroom));
+            if (Classrooms.Any(c => c.Id == classroom.Id)) throw new ArgumentException("Classroom already exists.", nameof(classroom));
 
-            _classrooms.Add(classroom);
+            Classrooms.Add(classroom);
         }
 
         public bool RemoveStudent(int studentId)
         {
-            var student = _students.FirstOrDefault(s => s.Id == studentId);
+            var student = Students.FirstOrDefault(s => s.Id == studentId);
             if (student == null) return false;
 
-            return _students.Remove(student);
+            return Students.Remove(student);
         }
 
         public bool RemoveClassroom(int classroomId)
         {
-            var classroom = _classrooms.FirstOrDefault(c => c.Id == classroomId);
+            var classroom = Classrooms.FirstOrDefault(c => c.Id == classroomId);
             if (classroom == null) return false;
 
-            return _classrooms.Remove(classroom);
+            return Classrooms.Remove(classroom);
         }
 
         public int GetTotalStudents()
         {
-            return _students.Count;
+            return Students.Count;
         }
 
         public int GetStudentsByGender(Gender gender)
         {
-            return _students.Count(s => s.Gender == gender);
+            return Students.Count(s => s.Gender == gender);
         }
 
         public int GetTotalClassrooms()
         {
-            return _classrooms.Count;
+            return Classrooms.Count;
         }
 
         public double GetAverageAge()
         {
-            if (!_students.Any()) return 0;
+            if (!Students.Any()) return 0;
 
             var today = DateTime.Today;
-            return _students.Average(s => (today - s.DateOfBirth).TotalDays / 365);
+            return Students.Average(s => (today - s.DateOfBirth).TotalDays / 365);
         }
 
         public IReadOnlyList<Classroom> GetClassroomsWithCynapSystem()
         {
-            return _classrooms.Where(c => c.HasCynapSystem).ToList().AsReadOnly();
+            return Classrooms.Where(c => c.HasCynapSystem).ToList().AsReadOnly();
         }
 
         public int GetTotalDistinctClasses()
         {
-            return _students.Select(s => s.ClassName).Distinct().Count();
+            return Students.Select(s => s.ClassName).Distinct().Count();
         }
 
         public IReadOnlyDictionary<string, int> GetClassesWithStudentCount()
         {
-            return _students.GroupBy(s => s.ClassName)
+            return Students.GroupBy(s => s.ClassName)
                            .ToDictionary(g => g.Key, g => g.Count())
                            .AsReadOnly();
         }
 
-        public double GetFemalePercentageInClass(string className)
+        public double gotFemalePercentageInClass(string className)
         {
             if (string.IsNullOrWhiteSpace(className)) throw new ArgumentException("Class name cannot be empty.", nameof(className));
 
-            var studentsInClass = _students.Where(s => s.ClassName == className).ToList();
+            var studentsInClass = Students.Where(s => s.ClassName == className).ToList();
             if (!studentsInClass.Any()) return 0;
 
             var femaleCount = studentsInClass.Count(s => s.Gender == Gender.Female);
@@ -120,8 +110,8 @@ namespace MyFirstWebApplication.Class
             if (string.IsNullOrWhiteSpace(className)) throw new ArgumentException("Class name cannot be empty.", nameof(className));
             if (string.IsNullOrWhiteSpace(roomName)) throw new ArgumentException("Room name cannot be empty.", nameof(roomName));
 
-            var studentsInClass = _students.Count(s => s.ClassName == className);
-            var room = _classrooms.FirstOrDefault(r => r.RoomName == roomName);
+            var studentsInClass = Students.Count(s => s.ClassName == className);
+            var room = Classrooms.FirstOrDefault(r => r.RoomName == roomName);
             return room != null && room.Capacity >= studentsInClass;
         }
     }
