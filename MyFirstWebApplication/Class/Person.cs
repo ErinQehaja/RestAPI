@@ -1,19 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyFirstWebApplication.Class
 {
-    public class Person
+    public enum Gender
     {
-        public string GenderPerson { get; set; }
-        public DateTime DateOfBirth { get; }
+        Male,
+        Female,
+        Other
+    }
 
-        public Person(string gender, DateTime dateOfBirth)
+    public abstract class Person
+    {
+        public int Id { get; set; } 
+        public Gender Gender { get; set; } 
+        public DateTime DateOfBirth { get; set; } 
+
+        protected Person() { } // Parameterless constructor for EF
+
+        public Person(int id, Gender gender, DateTime dateOfBirth)
         {
-            GenderPerson = gender;
+            if (id <= 0) throw new ArgumentException("ID must be positive.", nameof(id));
+            if (!Enum.IsDefined(typeof(Gender), gender)) throw new ArgumentException("Invalid gender.", nameof(gender));
+            if (dateOfBirth > DateTime.Today) throw new ArgumentException("Date of birth cannot be in the future.", nameof(dateOfBirth));
+
+            Id = id;
+            Gender = gender;
             DateOfBirth = dateOfBirth;
         }
     }

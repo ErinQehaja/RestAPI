@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management</title>
+    <link rel="stylesheet" href="stylepageSchool.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to HTL Dornbirn</h1>
+            <button onclick="toggleMenu()">Menu</button>
+        </header>
+        <nav id="menu" class="hidden">
+            <ul>
+                <li><a href="#" onclick="showSection('students')">Students</a></li>
+                <li><a href="#" onclick="showSection('classrooms')">Classrooms</a></li>
+            </ul>
+        </nav>
+        <main>
+            <section id="students" class="section hidden">
+                <h2>Manage Students</h2>
+                <!-- Add Student -->
+                <form id="add-student-form" onsubmit="addStudent(event)">
+                    <h3>Add Student</h3>
+                    <input type="text" id="student-name" placeholder="Name" required>
+                    <select id="student-gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="date" id="student-dob" required>
+                    <input type="text" id="student-class" placeholder="Class Name" required>
+                    <button type="submit">Add Student</button>
+                </form>
+                <!-- Delete Student -->
+                <form id="delete-student-form" onsubmit="deleteStudent(event)">
+                    <h3>Delete Student</h3>
+                    <input type="number" id="student-id" placeholder="Student ID" required>
+                    <button type="submit">Delete</button>
+                </form>
+                <!-- Get All Students -->
+                <div>
+                    <h3>All Students</h3>
+                    <button onclick="getAllStudents()">List All Students</button>
+                    <div id="students-list"></div>
+                </div>
+                <!-- Search Student by Name -->
+                <form id="search-student-form" onsubmit="getStudentByName(event)">
+                    <h3>Search Student by Name</h3>
+                    <input type="text" id="search-student-name" placeholder="Student Name" required>
+                    <button type="submit">Search</button>
+                    <div id="student-search-result"></div>
+                </form>
+                <!-- Search Students by Class -->
+                <form id="search-students-class-form" onsubmit="getStudentsByClass(event)">
+                    <h3>Search Students by Class</h3>
+                    <input type="text" id="search-class-name" placeholder="Class Name" required>
+                    <button type="submit">Search</button>
+                    <div id="students-class-result"></div>
+                </form>
+            </section>
+            <section id="classrooms" class="section hidden">
+                <h2>Manage Classrooms</h2>
+                <!-- Add Classroom -->
+                <form id="add-classroom-form" onsubmit="addClassroom(event)">
+                    <h3>Add Classroom</h3>
+                    <input type="text" id="classroom-name" placeholder="Room Name" required>
+                    <input type="number" id="classroom-size" placeholder="Size (sqm)" required step="0.1">
+                    <input type="number" id="classroom-capacity" placeholder="Capacity" required>
+                    <label><input type="checkbox" id="classroom-cynap"> Has Cynap System</label>
+                    <button type="submit">Add Classroom</button>
+                </form>
+                <!-- Delete Classroom -->
+                <form id="delete-classroom-form" onsubmit="deleteClassroom(event)">
+                    <h3>Delete Classroom</h3>
+                    <input type="number" id="classroom-id" placeholder="Classroom ID" required>
+                    <button type="submit">Delete</button>
+                </form>
+                <!-- Get All Classrooms -->
+                <div>
+                    <h3>All Classrooms</h3>
+                    <button onclick="getAllClassrooms()">List All Classrooms</button>
+                    <div id="classrooms-list"></div>
+                </div>
+                <!-- Search Classroom by Name -->
+                <form id="search-classroom-form" onsubmit="getClassroomByName(event)">
+                    <h3>Search Classroom by Name</h3>
+                    <input type="text" id="search-classroom-name" placeholder="Room Name" required>
+                    <button type="submit">Search</button>
+                    <div id="classroom-search-result"></div>
+                </form>
+                <!-- Check if Class Fits in Room -->
+                <form id="check-fit-form" onsubmit="checkClassFit(event)">
+                    <h3>Check if Class Fits in Room</h3>
+                    <input type="text" id="fit-class-name" placeholder="Class Name" required>
+                    <input type="text" id="fit-room-name" placeholder="Room Name" required>
+                    <button type="submit">Check</button>
+                    <div id="fit-result"></div>
+                </form>
+            </section>
+        </main>
+    </div>
+    <script src="scriptpageSchool.js"></script>
+</body>
+</html>
