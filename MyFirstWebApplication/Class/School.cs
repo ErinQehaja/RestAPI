@@ -6,8 +6,8 @@ namespace MyFirstWebApplication.Class
 {
     public class School
     {
-        public int Id { get; set; } // Changed to public set for EF
-        public string Name { get; set; } = null!; // EF requires non-nullable for required fields
+        public int Id { get; set; } 
+        public string Name { get; set; } = null!; 
         public List<Student> Students { get; set; } = new List<Student>(); // Navigation property for EF
         public List<Classroom> Classrooms { get; set; } = new List<Classroom>(); // Navigation property for EF
 

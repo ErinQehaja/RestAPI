@@ -11,9 +11,9 @@ namespace MyFirstWebApplication.Class
 
     public abstract class Person
     {
-        public int Id { get; set; } // Changed to public set for EF
-        public Gender Gender { get; set; } // Changed to public set for EF
-        public DateTime DateOfBirth { get; set; } // Changed to public set for EF
+        public int Id { get; set; } 
+        public Gender Gender { get; set; } 
+        public DateTime DateOfBirth { get; set; } 
 
         protected Person() { } // Parameterless constructor for EF
 

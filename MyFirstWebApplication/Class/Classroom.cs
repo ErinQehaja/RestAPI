@@ -5,8 +5,8 @@ namespace MyFirstWebApplication.Class
 {
     public class Classroom
     {
-        public int Id { get; set; } // Changed to public set for EF
-        public string RoomName { get; set; } = null!; // EF requires non-nullable for required fields
+        public int Id { get; set; } 
+        public string RoomName { get; set; } = null!; 
         public double Size { get; set; }
         public int Capacity { get; set; }
         public bool HasCynapSystem { get; set; }

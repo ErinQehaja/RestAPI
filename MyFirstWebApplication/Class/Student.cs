@@ -5,8 +5,8 @@ namespace MyFirstWebApplication.Class
 {
     public class Student : Person
     {
-        public string Name { get; set; } = null!; // EF requires non-nullable for required fields
-        public string ClassName { get; set; } = null!; // EF requires non-nullable for required fields
+        public string Name { get; set; } = null!; 
+        public string ClassName { get; set; } = null!; 
 
         public int SchoolId { get; set; } // Foreign key to School
         public School School { get; set; } // Navigation property for EF
