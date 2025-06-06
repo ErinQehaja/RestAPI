@@ -13,7 +13,7 @@ namespace MyFirstWebApplication.Class
 
         public School() { } // Parameterless constructor for EF
 
-        public School(int id, string name)
+        public School(int id, string name) // Konstruktor
         {
             if (id <= 0) throw new ArgumentException("ID must be positive.", nameof(id));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
@@ -69,14 +69,6 @@ namespace MyFirstWebApplication.Class
             return Classrooms.Count;
         }
 
-        public double GetAverageAge()
-        {
-            if (!Students.Any()) return 0;
-
-            var today = DateTime.Today;
-            return Students.Average(s => (today - s.DateOfBirth).TotalDays / 365);
-        }
-
         public IReadOnlyList<Classroom> GetClassroomsWithCynapSystem()
         {
             return Classrooms.Where(c => c.HasCynapSystem).ToList().AsReadOnly();
@@ -103,16 +95,6 @@ namespace MyFirstWebApplication.Class
 
             var femaleCount = studentsInClass.Count(s => s.Gender == Gender.Female);
             return (double)femaleCount / studentsInClass.Count * 100;
-        }
-
-        public bool CanClassFitInRoom(string className, string roomName)
-        {
-            if (string.IsNullOrWhiteSpace(className)) throw new ArgumentException("Class name cannot be empty.", nameof(className));
-            if (string.IsNullOrWhiteSpace(roomName)) throw new ArgumentException("Room name cannot be empty.", nameof(roomName));
-
-            var studentsInClass = Students.Count(s => s.ClassName == className);
-            var room = Classrooms.FirstOrDefault(r => r.RoomName == roomName);
-            return room != null && room.Capacity >= studentsInClass;
         }
     }
 }
